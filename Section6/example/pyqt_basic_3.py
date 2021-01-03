@@ -16,13 +16,15 @@ from PyQt5.QtWidgets import *
 from PyQt5 import uic
 from pyqt_basic_ui import Ui_MainWindow
 
-# form_class = uic.loadUiType('C:/Users/sw991/Crawling/Section6/example/pyqt_basic_3.ui')[0]
+###### Ui를 XML 로 불러서 오는 방법 ######
 
+# form_class = uic.loadUiType('C:/Users/sw991/Crawling/Section6/example/pyqt_basic_3.ui')[0]
 # class TestForm(QMainWindow,form_class): # 메뉴, 상태표시줄 등 표시
 #     def __init__(self):
 #         super().__init__() # 부모 생성자 호출
 #         self.setupUi(self)
 
+###### Python file에서 직접 호출하는 방법 ######
 class TestForm(QMainWindow,Ui_MainWindow): # 메뉴, 상태표시줄 등 표시
     def __init__(self):
         super().__init__() # 부모 생성자 호출
