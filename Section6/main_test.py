@@ -18,6 +18,8 @@ from lib.AuthDialog import AuthDialog
 # import os
 # os.path.('C:/Users/sw991/Crawling/Section6/ui/ui_ver1.0.ui') 에 + join 하여 사용
 
+import pytube
+
 #PyQt5 에 webengineview 를 pip install로 따로 처리해서 진행했음
 class Main(QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -33,6 +35,10 @@ class Main(QMainWindow, Ui_MainWindow):
 
         # 재생여부
         self.is_play = False
+
+        # youtube 관련 작업 전역변수 선언
+        self.youtb = None
+        self.youtb_fsize = 0
 
     # 기본 UI 비활성화
     def initAuthLock(self): # 인증받기전에 쓰지 못하게 하기 위해서 Lock
@@ -67,6 +73,7 @@ class Main(QMainWindow, Ui_MainWindow):
         self.webView.loadProgress.connect(self.showProgressBrowserLoading)
         self.FileNaviButton.clicked.connect(self.selectDownPath)
         self.calendarWidget.clicked.connect(self.appendDate)
+        self.StartButton.clicked.connect(self.downloadYoutb)
 
     @pyqtSlot()
     def authCheck(self):
@@ -129,24 +136,66 @@ class Main(QMainWindow, Ui_MainWindow):
                 self.previewButton.setText('중지')
                 self.is_play = True
                 self.StartButton.setEnabled(True)
+
+                self.initialYouWork(url)
+
             else:
                 QMessageBox.about(self,'URL 형식 오류','Youtube 주소 형식이 아닙니다.')
                 self.urlTextEdit.clear() # URL 오입력으로 삭제
                 self.urlTextEdit.setFocus(True) # 새로운 Focus
 
+    def initialYouWork(self,url):
+        video_list = pytube.YouTube(url)
+        # Loading Bar 계산
+        self.youtb = video_list.streams.filter(file_extension='mp4')
+        self.StreamCombobox.clear()
+        for q in self.youtb:
+            # print(q)
+            # print(type(q))
+            # print(str(q))
+
+            # filter 없이 사용할 경우 Code
+            # <Stream: itag="160" mime_type="video/mp4" res="144p" fps="30fps" vcodec="avc1.4d400c" progressive="False" type="video">
+            # print(q.itag,q.mime_type ~~~) -> None 처리 되는 항목들 제거
+            # tmp_list, str_list = [],[]
+            # tmp_list.append(str(q.mime_type or ''))
+            # tmp_list.append(str(q.res or ''))
+            # tmp_list.append(str(q.fps or ''))
+            #
+            # print(tmp_list)
+            # str_list = [x for x in tmp_list if x !='']
+            # print('step3',str_list)
+
+            # COMBOBOX에 List 추가
+            # 위에서 stream Class 안의 요소를 꺼낼때 Error 발생 -> Class 내 변수 어떻게 꺼낼지 공부 필요
+            self.StreamCombobox.addItem(str(q))
+
+# 잠시 점검 필요
+    # @pyqtSlot()
+    # def downloadYoutb(self):
+    #     down_dir = self.pathTextEdit.text().strip()
+    #     if donw_dir is None or down_dir =='' or not down_dir:
+    #         QMessageBox.about(self,'경로 선택','DownLoad 받을 경로를 선택하세요')
+    #         return None
+
+        # self.youtb_fsize = self.youtb[self.StreamCombobox.currentIndex()].filesize
+        # print('fsize',self.youtb_fsize)
+        # self.youtb[StreamCombobox.currentIndex()].download(down_dir)
+        # self.append_log_msg('DownLoad Click')
+
     @pyqtSlot(int) # 명시적으로 int가 넘어온다고 표시해줘야함
     def showProgressBrowserLoading(self,v):
         self.progressBar.setValue(v)
-
-    @pyqtSlot()
-    def selectDownPath(self):
-        # File 선택
-        # fname = QFileDialog.getOpenFileName(self)
-        # self.pathTextEdit.setText(fname[0]) # file 선택 기능
-
-        # 경로 선택
-        fpath = QFileDialog.getExistngDirectory(self,'Select Directory')
-        self.pathTextEdit.setText(fpath)
+#잠시 점검 필요 -> 여기서 자꾸 멈춤
+    # @pyqtSlot()
+    # def selectDownPath(self):
+    #     # File 선택
+    #     # fname = QFileDialog.getOpenFileName(self)
+    #     # self.pathTextEdit.setText(fname[0]) # file 선택 기능
+    #
+    #     # 경로 선택
+    #     fpath = QFileDialog.getExistngDirectory(self,'Select Directory')
+    #     self.pathTextEdit.setText(fpath)
 
     @pyqtSlot()
     def appendDate(self):
