@@ -136,7 +136,6 @@ class Main(QMainWindow, Ui_MainWindow):
                 self.previewButton.setText('중지')
                 self.is_play = True
                 self.StartButton.setEnabled(True)
-
                 self.initialYouWork(url)
 
             else:
@@ -147,6 +146,10 @@ class Main(QMainWindow, Ui_MainWindow):
     def initialYouWork(self,url):
         video_list = pytube.YouTube(url)
         # Loading Bar 계산
+        video_list.register_on_progress_callback(self.showprogressDownLoading)
+        # pytube에서 지원하는 함수 : register_on_progress_callback
+
+
         self.youtb = video_list.streams.filter(file_extension='mp4')
         self.StreamCombobox.clear()
         for q in self.youtb:
@@ -170,32 +173,40 @@ class Main(QMainWindow, Ui_MainWindow):
             # 위에서 stream Class 안의 요소를 꺼낼때 Error 발생 -> Class 내 변수 어떻게 꺼낼지 공부 필요
             self.StreamCombobox.addItem(str(q))
 
-# 잠시 점검 필요
-    # @pyqtSlot()
-    # def downloadYoutb(self):
-    #     down_dir = self.pathTextEdit.text().strip()
-    #     if donw_dir is None or down_dir =='' or not down_dir:
-    #         QMessageBox.about(self,'경로 선택','DownLoad 받을 경로를 선택하세요')
-    #         return None
+    @pyqtSlot()
+    def downloadYoutb(self):
+        down_dir = self.pathTextEdit.text().strip()
+        # if donw_dir is None or down_dir =='' or not down_dir:
+        #     QMessageBox.about(self,'경로 선택','DownLoad 받을 경로를 선택하세요')
+        #     return None
+        self.youtb_fsize = self.youtb[self.StreamCombobox.currentIndex()].filesize
+        print(self.youtb[self.StreamCombobox.currentIndex()])
+        print('4')
+        self.youtb[self.StreamCombobox.currentIndex()].download(down_dir)
+        self.append_log_msg('DownLoad Click')
 
-        # self.youtb_fsize = self.youtb[self.StreamCombobox.currentIndex()].filesize
-        # print('fsize',self.youtb_fsize)
-        # self.youtb[StreamCombobox.currentIndex()].download(down_dir)
-        # self.append_log_msg('DownLoad Click')
+    def showprogressDownLoading(self,stream,chunk,bytes_remaining):
+        print('7')
+        print('bytes_remaining',bytes_remaining)
+        self.progressBar_2.setValue(int(((self.youtb_fsize - bytes_remaining) / self.youtb_fsize) * 100))
 
     @pyqtSlot(int) # 명시적으로 int가 넘어온다고 표시해줘야함
     def showProgressBrowserLoading(self,v):
         self.progressBar.setValue(v)
+
+
+
+
 #잠시 점검 필요 -> 여기서 자꾸 멈춤
-    # @pyqtSlot()
-    # def selectDownPath(self):
-    #     # File 선택
-    #     # fname = QFileDialog.getOpenFileName(self)
-    #     # self.pathTextEdit.setText(fname[0]) # file 선택 기능
-    #
-    #     # 경로 선택
-    #     fpath = QFileDialog.getExistngDirectory(self,'Select Directory')
-    #     self.pathTextEdit.setText(fpath)
+    @pyqtSlot()
+    def selectDownPath(self):
+        # File 선택
+        # fname = QFileDialog.getOpenFileName(self)
+        # self.pathTextEdit.setText(fname[0]) # file 선택 기능
+
+        # 경로 선택
+        fpath = QFileDialog.getExistingDirectory(self,'Select Directory')
+        self.pathTextEdit.setText(fpath)
 
     @pyqtSlot()
     def appendDate(self):

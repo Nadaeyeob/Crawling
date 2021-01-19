@@ -145,7 +145,7 @@ class Main(QMainWindow, Ui_MainWindow):
         # self.pathTextEdit.setText(fname[0]) # file 선택 기능
 
         # 경로 선택
-        fpath = QFileDialog.getExistngDirectory(self,'Select Directory')
+        fpath = QFileDialog.getExistingDirectory(self,'Select Directory')
         self.pathTextEdit.setText(fpath)
 
     @pyqtSlot()
