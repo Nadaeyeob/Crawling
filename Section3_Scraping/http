@@ -1,0 +1,5 @@
+# http 통신
+# 1. 비연결 지향
+# 2. 상태 정보 유지 하지 않음 -> cookie, session 등이 없으면 매번 재연결 해야함
+# Cookie : client 에서 저장 = client request -> server resopnse with cookie -> client request iwth cookie -> server resopnse
+# Session : server 에서 저장
